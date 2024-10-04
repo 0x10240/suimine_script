@@ -1,3 +1,5 @@
+from asyncio import timeout
+
 from playwright.sync_api import sync_playwright
 import time
 import json
@@ -60,19 +62,31 @@ class SuiMiner:
             self.save_addresses(f'{address}:{private_key}')
 
             while True:
-                button = page.locator("//button[contains(text(),'Mine with Web GPU')]")
-                if button.is_enabled():
-                    logger.info('click start button')
-                    button.click()
+                try:
+                    button = page.locator("//button[contains(text(),'Mine with Web GPU')]")
+                    if button.is_enabled():
+                        logger.info('click start button')
+                        button.click()
+                    elif page.query_selector_all("div.text-red-500"):
+                        page.reload()
+                        time.sleep(3)
 
-                if page.query_selector_all("div.text-red-500"):
-                    page.reload()
-                    time.sleep(3)
+                    try:
+                        button = page.get_by_text("Stop Mine with Web GPU")
+                        if button.is_enabled():
+                            logger.info("miner is started.")
+                    except Exception as e:
+                        logger.info(e)
+                        page.reload()
 
-                time.sleep(1)
+                    time.sleep(1)
+
+                except Exception:
+                    logger.info("miner is started.")
+                    time.sleep(10)
 
 
 if __name__ == "__main__":
-    data_dir = "./chrome_data"
+    data_dir = "./chrome_data_1"
     miner = SuiMiner(data_dir)
     miner.run()
