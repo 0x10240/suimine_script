@@ -9,12 +9,13 @@ from loguru import logger
 class SuiMiner:
     def __init__(self, data_dir):
         self.data_dir = data_dir
-        self.accounts = {}
+        self.accounts = self.load_addresses()
 
     def load_addresses(self):
-        with open('account.json', 'w') as f:
-            self.accounts = json.load(f)
-
+        with open('account.json', 'r') as f:
+            accounts = json.load(f)
+            return accounts
+            
     def save_addresses(self, account):
         if self.data_dir in self.accounts:
             logger.info('地址已存在')
