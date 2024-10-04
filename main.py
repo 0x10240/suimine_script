@@ -1,5 +1,3 @@
-from asyncio import timeout
-
 from playwright.sync_api import sync_playwright
 import time
 import json
@@ -15,7 +13,7 @@ class SuiMiner:
         with open('account.json', 'r') as f:
             accounts = json.load(f)
             return accounts
-            
+
     def save_addresses(self, account):
         if self.data_dir in self.accounts:
             logger.info('地址已存在')
@@ -23,7 +21,7 @@ class SuiMiner:
 
         self.accounts[self.data_dir] = account
         with open('account.json', 'w') as f:
-            json.dump(self.accounts, f)
+            json.dump(self.accounts, f, indent=2)
 
     def run(self):
         with sync_playwright() as p:
@@ -88,6 +86,8 @@ class SuiMiner:
 
 
 if __name__ == "__main__":
-    data_dir = "./chrome_data_1"
+    import sys
+
+    data_dir = f'chrome_data_{sys.argv[1]}'
     miner = SuiMiner(data_dir)
     miner.run()
